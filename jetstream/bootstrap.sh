@@ -49,9 +49,6 @@ salt-call state.highstate
 
 salt-call state.highstate
 
-# Install Singularity - still in upcoming
-yum -y install --enablerepo osg-upcoming-development singularity
-
 yum -y clean all
 
 /etc/init.d/salt-master restart

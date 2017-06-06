@@ -23,11 +23,6 @@ condor:
     - managed
     - source: salt://htcondor/10-main.conf
 
-/etc/condor/config.d/50-master.conf:
-  file:
-    - managed
-    - source: salt://htcondor/50-master.conf
-
 /usr/libexec/osgvo:
   file.directory:
     - user: root
