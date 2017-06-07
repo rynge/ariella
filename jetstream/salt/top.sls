@@ -1,6 +1,7 @@
 base:
   '*':
     - salt
+    - auto-update
     - users
     - yum
     - certs
