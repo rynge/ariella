@@ -1,6 +1,6 @@
 #!/bin/bash
 
-find /root/ -maxdepth 1 -name .ariella.auto-update -mmin +720 -exec rm -f {} \;
+find /root/ -maxdepth 1 -name .ariella.auto-update -mmin +60 -exec rm -f {} \;
 if [ -e /root/.ariella.auto-update ]; then
     exit 0
 fi
