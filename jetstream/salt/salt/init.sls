@@ -20,14 +20,6 @@
     - template: jinja
     - source: salt://salt/master.conf
 
-/etc/salt/minion.d/jetstream-osg.conf:
-  file.managed:
-    - user: root
-    - group: root
-    - mode: 644
-    - template: jinja
-    - source: salt://salt/jetstream-osg.conf
-
 /etc/salt/master.d/jetstream-osg.conf:
   file.managed:
     - user: root

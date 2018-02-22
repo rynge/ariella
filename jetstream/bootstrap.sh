@@ -34,10 +34,10 @@ yum -y install tcsh wget curl rsync which time bc octave octave-devel \
 # bootstrap salt
 yum install -y salt-master salt-minion
 mkdir -p /etc/salt/minion.d /etc/salt/master.d
-echo "master: "`hostname -f` >/srv/ariella/jetstream/salt/salt/master.conf
+#echo "master: "`hostname -f` >/srv/ariella/jetstream/salt/salt/master.conf
 cp /srv/ariella/jetstream/salt/salt/*.conf /etc/salt/minion.d/
 cp /srv/ariella/jetstream/salt/salt/jetstream-osg.conf /etc/salt/master.d/
-hostname -f >/etc/salt/minion_id
+#hostname -f >/etc/salt/minion_id
 /etc/init.d/salt-master restart
 
 # run the recipe
