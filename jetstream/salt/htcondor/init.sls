@@ -42,5 +42,12 @@ condor:
     - source: salt://htcondor/user-job-wrapper.sh
     - mode: 755
 
+/etc/condor/master_shutdown_script.sh:
+  file:
+    - managed
+    - mode: 755
+    - source: salt://htcondor/master_shutdown_script.sh
+
+
 
 
