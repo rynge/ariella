@@ -15,7 +15,8 @@ if [ -e /tmp/.ariella.auto-update ]; then
 fi
 
 cd /srv/ariella
-git pull
+git fetch --all
+git reset --hard origin/master
 
 touch /tmp/.ariella.auto-update
 
