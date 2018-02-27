@@ -3,6 +3,10 @@
 # hack - we need an extra reboot to get the disk correctly resized
 if [ ! -e /tmp/.ariella.reboot.1 ]; then
     touch /tmp/.ariella.reboot.1
+    cd /srv/ariella
+    git fetch --all
+    git reset --hard origin/master
+
     cd /srv/ariella/jetstream
     ./bootstrap.sh
     reboot

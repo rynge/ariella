@@ -6,6 +6,7 @@ condor:
       - file: /etc/yum.repos.d/pegasus.repo
   service.running:
     - enable: True
+    - reload: True
     - watch:
       - file: /etc/condor/pool_password
       - file: /etc/condor/config.d/10-main.conf
