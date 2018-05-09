@@ -35,12 +35,25 @@ pegasus:
     - require:
       - file: /etc/yum.repos.d/pegasus.repo
 
+####################################################################################
+#
+# disabled services
+
 # no need for fetch crl anymore - comes in over cvmfs
+
 fetch-crl-boot:
-  service.running:
+  service.dead:
     - enable: False
 
 fetch-crl-cron:
-  service.running:
+  service.dead:
+    - enable: False
+
+fail2ban:
+  service.dead:
+    - enable: False
+
+iptables:
+  service.dead:
     - enable: False
 
