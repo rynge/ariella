@@ -1,6 +1,7 @@
 base:
   '*':
     - salt
+    - dhcp
     - auto-update
     - users
     - yum
