@@ -49,6 +49,10 @@ fetch-crl-cron:
   service.dead:
     - enable: False
 
+cups:
+  service.dead:
+    - enable: False
+
 fail2ban:
   service.dead:
     - enable: False
@@ -56,4 +60,13 @@ fail2ban:
 iptables:
   service.dead:
     - enable: False
+
+ip6tables:
+  service.dead:
+    - enable: False
+
+mdmonitor:
+  service.dead:
+    - enable: False
+
 
