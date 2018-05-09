@@ -35,4 +35,12 @@ pegasus:
     - require:
       - file: /etc/yum.repos.d/pegasus.repo
 
+# no need for fetch crl anymore - comes in over cvmfs
+fetch-crl-boot:
+  service.running:
+    - enable: False
+
+fetch-crl-cron:
+  service.running:
+    - enable: False
 
