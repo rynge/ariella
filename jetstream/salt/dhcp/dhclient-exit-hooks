@@ -7,7 +7,10 @@ LOG=/var/log/atmo/dhcp_hostname.log
 # Function: get_hostname()
 # Description: Gets the hostname, depending on the distro
 get_hostname() {
-   hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -mjson.tool | sed -n -e '/"hostname":/ s/^.*"\(.*\)".*/\1/p')
+   hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -mjson.tool | sed -n -e '/"public-hostname":/ s/^.*"\(.*\)".*/\1/p')
+   if [ "X$hostname_value" = "X" ]; then
+       hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -mjson.tool | sed -n -e '/"hostname":/ s/^.*"\(.*\)".*/\1/p')
+   fi
 }
 
 # This function will lookup the ip address
@@ -37,9 +40,6 @@ while [ $retry -lt $MAX_ATTEMPTS -a -z "$hostname_value" ]; do
     sleep 1
 done
 
-# we want the domain to be "jestreamlocal"
-hostname_value=`echo "$hostname_value" | sed 's/novalocal/jetstreamlocal/'`
-
 # retest hostname value
 if [ -z $hostname_value ]; then
     domainname="jetstreamlocal"
@@ -54,8 +54,10 @@ else
     echo $hostname_value > /etc/hostname
     hostname_value_short=$(echo $hostname_value | sed "s/\..*//")
     myip=$(dig $hostname_value +short)
-    sed -ri "/^.*vm[0-9]+-[0-9]+\.cyverse\.org.*$/d" /etc/hosts
-    grep -q "$myip $hostname_value $hostname_value_short" /etc/hosts || echo "$myip $hostname_value $hostname_value_short" >> /etc/hosts
+    if [ "X$myip" != "X" ]; then
+        sed -ri "/^.*vm[0-9]+-[0-9]+\.cyverse\.org.*$/d" /etc/hosts
+        grep -q "$myip $hostname_value $hostname_value_short" /etc/hosts || echo "$myip $hostname_value $hostname_value_short" >> /etc/hosts
+    fi
     echo $(date +"%m%d%y %H:%M:%S") "   Hostname has been set to `hostname`" >> $LOG
 fi
 
