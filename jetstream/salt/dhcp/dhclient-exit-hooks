@@ -4,12 +4,28 @@ PREFIX="js-"
 
 LOG=/var/log/atmo/dhcp_hostname.log
 
+# Sync OS time using the host's hardware time
+echo $(date +"%m%d%y %H:%M:%S") "Syncing system time with hardware time" >> $LOG
+echo "     DEBUG: Date BEFORE sync:" $(date) >> $LOG
+hwclock -s
+rc=$?
+echo "     DEBUG: Date AFTER sync:" $(date)  "hwclock exit status: $rc" >> $LOG
+
 # Function: get_hostname()
 # Description: Gets the hostname, depending on the distro
 get_hostname() {
-   hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -mjson.tool | sed -n -e '/"public-hostname":/ s/^.*"\(.*\)".*/\1/p')
-   if [ "X$hostname_value" = "X" ]; then
-       hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -mjson.tool | sed -n -e '/"hostname":/ s/^.*"\(.*\)".*/\1/p')
+   local is_centos5=0
+   if [ -e /etc/redhat-release ]; then
+      s=$(grep 'CentOS release 5' /etc/redhat-release)
+      if [ $? -eq 0 ]; then
+         is_centos5=1
+      fi
+   fi
+
+   if [ $is_centos5 -eq 1 ]; then
+      hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -c'from simplejson.tool import main; main()' | sed -n -e '/"public-hostname":/ s/^.*"\(.*\)".*/\1/p')
+   else
+      hostname_value=$(curl -s 'http://169.254.169.254/openstack/latest/meta_data.json' | python -mjson.tool | sed -n -e '/"public-hostname":/ s/^.*"\(.*\)".*/\1/p')
    fi
 }
 
@@ -40,9 +56,13 @@ while [ $retry -lt $MAX_ATTEMPTS -a -z "$hostname_value" ]; do
     sleep 1
 done
 
+
 # retest hostname value
 if [ -z $hostname_value ]; then
-    domainname="jetstreamlocal"
+    domainname=".$(dnsdomainname)"
+    if [ $domainname = ".(none)" ];then
+        domainname=""
+    fi
     third_octet=$(echo $myip | cut -f 3 -d '.')
     fourth_octet=$(echo $myip | cut -f 4 -d '.')
     fallback_hostname=${PREFIX}${third_octet}-${fourth_octet}${domainname}
@@ -54,10 +74,8 @@ else
     echo $hostname_value > /etc/hostname
     hostname_value_short=$(echo $hostname_value | sed "s/\..*//")
     myip=$(dig $hostname_value +short)
-    if [ "X$myip" != "X" ]; then
-        sed -ri "/^.*vm[0-9]+-[0-9]+\.cyverse\.org.*$/d" /etc/hosts
-        grep -q "$myip $hostname_value $hostname_value_short" /etc/hosts || echo "$myip $hostname_value $hostname_value_short" >> /etc/hosts
-    fi
+    sed -ri "/^.*vm[0-9]+-[0-9]+\.cyverse\.org.*$/d" /etc/hosts
+    grep -q "$myip $hostname_value $hostname_value_short" /etc/hosts || echo "$myip $hostname_value $hostname_value_short" >> /etc/hosts
     echo $(date +"%m%d%y %H:%M:%S") "   Hostname has been set to `hostname`" >> $LOG
 fi
 
